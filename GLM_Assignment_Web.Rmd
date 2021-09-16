@@ -1,0 +1,88 @@
+---
+title: 'GLM Assignment : Poisson and Binomial'
+subtitle: Trevor Walker
+output:
+  html_document:
+    df_print: paged
+---
+```{r setup2, include=FALSE}
+#lapply(packages_needed, require, character.only = TRUE)
+library(ggplot2)
+library(plyr)
+library(MASS)
+library(dplyr)
+library(ggfortify)
+```
+First I need to read in data
+
+```{r Data, include=TRUE}
+Bat_M.A_Data<- read.csv("Data/GLM_Assignment_2.csv")
+
+Bat_M.A_Data
+```
+My First GLM using the poisson family because I'm looking at discrete count data.
+
+```{r glm 1, include=TRUE}
+Bat_NetVSAcoust.glm<- glm(Net_Species_Richness~ Acoustic_Species_Richness, data=Bat_M.A_Data , family= poisson(link = "log"))
+
+
+```
+View the plot
+
+```{r plot 1, include=TRUE}
+
+Bat_NetVSAcoust.plot<- ggplot(Bat_NetVSAcoust.glm, aes(Acoustic_Species_Richness, Net_Species_Richness)) + 
+  geom_point(size=3) +stat_smooth(method = glm, method.args = list(family = poisson(link = "log"))) +
+  labs(title="GLM Family= Poisson, Bat Acoustics VS. Mist-net Numbers") +
+  xlab ("Acoustic # of Species") +
+  ylab ("MistNet # of Species")
+
+Bat_NetVSAcoust.plot
+
+
+```
+Next We can View the Autoplot
+```{r autoplot 1, include=TRUE}
+autoplot(Bat_NetVSAcoust.glm)
+```
+
+```{r Anova and summary 1, include=TRUE}
+anova(Bat_NetVSAcoust.glm)
+
+summary(Bat_NetVSAcoust.glm)
+```
+Here We can see there is no statistical significance of the acoustic data of Species Richness detected with the species richness detected via mist netting.
+
+
+Next We will look at the presence or absence of the Big Brown Bat (EPFU) by looking at Site Quality
+
+```{r GLM Binomial, include=TRUE}
+EPFU_OccuranceVSSite_Quality.glm<- glm(EPFU_Occurance~ Visual_Score, data=Bat_M.A_Data , family= binomial(link = "logit"))
+
+```
+Then we will view the plot
+```{r plot 2}
+EPFU_OccuranceVSSite_Quality.plot<- ggplot(EPFU_OccuranceVSSite_Quality.glm, aes(Visual_Score, EPFU_Occurance)) + 
+  geom_point(size=3) +stat_smooth(method = glm, method.args = list(family = binomial)) +
+  labs(title="GLM Family= Binomial,  EPFU Occurance by Site Visual Quality") +
+  xlab ("Site Quality Category") +
+  ylab ("Probability of EPFU Occurance")
+
+EPFU_OccuranceVSSite_Quality.plot
+```
+
+The autoplot
+```{r autoplot 2}
+autoplot(EPFU_OccuranceVSSite_Quality.glm)
+```
+
+Next we look at the summary
+
+```{r Interaction Plot}
+anova(EPFU_OccuranceVSSite_Quality.glm)
+
+summary(EPFU_OccuranceVSSite_Quality.glm)
+```
+For Every increase in Site Quality Score the Probability of an EPFU occurance increases.
+
+
